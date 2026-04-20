@@ -1525,15 +1525,6 @@ function normalize(val){
 return val
 .toString()
 .toLowerCase()
-.replace(/\s+/g,'')       // remove spaces
-.replace(/\.0+$/,'')      // remove trailing .0
-.replace(/^0+/,'0');      // normalize leading zeros
-}
-
-function normalize(val){
-return val
-.toString()
-.toLowerCase()
 .replace(/\s+/g,'')
 .replace('remainder','r')
 .replace(/\.0+$/,'');
@@ -1544,37 +1535,42 @@ timerEl.innerText='TIME: '+timeLeft;
 }
 
 /* ======================================================
-   QUESTIONS
-====================================================== */
-function generateQuestion(){
-
-const level =
-difficulty==='green'?'easy':
-difficulty==='yellow'?'medium':'hard';
-
-const q = CURRICULUM[currentGrade][level].generate();
-
-question.innerText=q[0];
-currentAnswer=String(q[1]).toLowerCase();
-}
-
-/* ======================================================
    ANSWERS
 ====================================================== */
 function submitAnswer(){
+  if(gameLocked) return;
 
-if(gameLocked) return;
+  const val = normalize(answer.value);
+  if(val === "") return;
 
-const val = normalize(answer.value);
-if(val==="") return;
+  gameLocked = true;
 
-gameLocked = true;
-
-if(val === normalize(currentAnswer)){
-  correct();
-}else{
-  loseLife();
+  if(val === normalize(currentAnswer)){
+    correct();
+  }else{
+    loseLife();
+  }
 }
+
+function loseLife(){
+  clearInterval(timer);
+  beep(150,400,'sawtooth');
+
+  lives--;
+
+  if(lives >= 0 && hearts[lives]){
+    hearts[lives].classList.add('dead');
+  }
+
+  if(lives <= 0){
+    lives = 0;
+    endGame();
+  }else{
+    setTimeout(()=>{
+      backToDoors();
+      gameLocked = false;
+    },250);
+  }
 }
 
 function correct(){
@@ -1597,31 +1593,6 @@ setTimeout(()=>{
   backToDoors();
   gameLocked = false;
 },250);
-}
-
-function loseLife(){
-
-if(gameLocked) return;
-gameLocked = true;
-
-clearInterval(timer);
-beep(150,400,'sawtooth');
-
-lives--;
-
-if(lives >= 0 && hearts[lives]){
-  hearts[lives].classList.add('dead');
-}
-
-if(lives <= 0){
-  lives = 0; // clamp
-  endGame();
-}else{
-  setTimeout(()=>{
-    backToDoors();
-    gameLocked = false;
-  },250);
-}
 }
 
 /* ======================================================
