@@ -1756,6 +1756,8 @@ question.innerText = q[0];
 currentAnswer = String(q[1]);
 }
 
+const answer=document.getElementById('answer');
+
 answer.addEventListener("keydown", (e)=>{
   if(e.key === "Enter"){
     e.preventDefault();
@@ -1768,7 +1770,6 @@ answer.addEventListener("keydown", (e)=>{
 ====================================================== */
 const doors=document.getElementById('doors');
 const question=document.getElementById('question');
-const answer=document.getElementById('answer');
 const timerEl=document.getElementById('timer');
 const scoreEl=document.getElementById('score');
 const gameArea=document.getElementById('gameArea');
