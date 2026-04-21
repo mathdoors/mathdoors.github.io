@@ -1536,30 +1536,42 @@ restartGame();
 ====================================================== */
 function startGame(e, level){
 
-if(gameLocked) return;
-gameLocked = true;
+  if(gameLocked) return;
 
-ctx.resume();
+  const door = e.currentTarget;
 
-difficulty = level;
-beep(600,120);
+  // 🔥 prevent weird re-triggers
+  if(door.classList.contains('open')) return;
 
-const door = e.currentTarget;
+  gameLocked = true;
 
-/* FORCE animation reset */
-door.classList.remove('open');
-void door.offsetWidth; // reflow trick
-door.classList.add('open');
+  ctx.resume();
+  difficulty = level;
+  beep(600,120);
 
-setTimeout(()=>{
-screenFlash();
-doors.style.display='none';
-gameArea.style.display='block';
-generateQuestion();
-startTimer();
-answer.focus();
-gameLocked = false;
-},550);
+  // reset + play animation
+  door.classList.remove('open');
+  door.style.animation = 'none';
+  door.offsetHeight;
+  door.style.animation = '';
+  door.classList.add('open');
+
+  // 🔥 USE animationend INSTEAD OF setTimeout
+  door.addEventListener('animationend', function handler(){
+
+    door.removeEventListener('animationend', handler);
+
+    screenFlash();
+    doors.style.display='none';
+    gameArea.style.display='block';
+
+    generateQuestion();
+    startTimer();
+    answer.focus();
+
+    gameLocked = false;
+  });
+}
 }
 
 function startTimer(){
@@ -1679,6 +1691,7 @@ function correct(){
 function endGame(){
 
   clearInterval(timer);
+  gameLocked = true; // 🔥 ADD THIS
 
   const key='highscore_grade_'+currentGrade;
   let best=localStorage.getItem(key)||0;
@@ -1700,26 +1713,41 @@ function endGame(){
 ====================================================== */
 function restartGame(){
 
-clearInterval(timer);
+  clearInterval(timer);
 
-streak = 0;
-multiplier = 1;
-document.getElementById("streak").innerText = "STREAK: 0";
+  // reset state
+  gameLocked = false;
+  streak = 0;
+  multiplier = 1;
+  score = 0;
+  lives = 3;
+  difficulty = null;
 
-score=0;
-lives=3;
-difficulty=null;
+  document.getElementById("streak").innerText = "STREAK: 0";
+  scoreEl.innerText='SCORE: 0';
 
-scoreEl.innerText='SCORE: 0';
-hearts.forEach(h=>h.classList.remove('dead'));
+  hearts.forEach(h=>h.classList.remove('dead'));
 
-gameOver.style.display='none';
-gameArea.style.display='none';
-doors.style.display='flex';
+  // reset UI
+  gameOver.style.display='none';
+  gameArea.style.display='none';
+  doors.style.display='flex';
 
-answer.value='';
+  // 🔥 CRITICAL: RESET ALL DOORS COMPLETELY
+  document.querySelectorAll('.door').forEach(d=>{
+    d.classList.remove('open');
+
+    d.style.animation = 'none';
+    d.style.transform = 'none';
+
+    d.offsetHeight; // force reflow
+
+    d.style.animation = '';
+    d.style.transform = '';
+  });
+
+  answer.value='';
 }
-
 /* ======================================================
    RETURN TO DOORS
 ====================================================== */
