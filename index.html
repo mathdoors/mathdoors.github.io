@@ -72,12 +72,13 @@ overflow:auto;
    GRADE SELECTOR (LEFT PANEL)
 ====================================================== */
 #gradePanel{
-position:absolute;
-left:70px;
-top:180px;
-display:flex;
-flex-direction:column;
-gap:18px;
+  position:fixed;   /* 🔥 important */
+  left:30px;
+  top:160px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  z-index:1000;     /* 🔥 above everything */
 }
 
 .gradeBox{
@@ -96,10 +97,6 @@ transform:scale(1.05);
 color:#00ffff;
 border-color:#00ffff;
 box-shadow:0 0 18px #00ffff;
-}
-
-#gradePanel{
-  z-index: 10;
 }
 
 /* ======================================================
