@@ -1511,8 +1511,7 @@ for(let i=1;i<=9;i++){
 
 function selectGrade(g){
 
-if(gameLocked) return;
-
+if(gameArea.style.display === 'block') return;
 currentGrade = g;
 
 document.querySelectorAll('.gradeBox')
@@ -1717,18 +1716,24 @@ answer.value='';
    RETURN TO DOORS
 ====================================================== */
 function backToDoors(){
-   
-gameLocked = false;
-gameArea.style.display='none';
-doors.style.display='flex';
 
-document.querySelectorAll('.door').forEach(d=>{
-  d.classList.remove('open');
-});
+  gameLocked = false;
 
-answer.value='';
+  gameArea.style.display='none';
+  doors.style.display='flex';
+
+  document.querySelectorAll('.door').forEach(d=>{
+    d.classList.remove('open');
+
+    // 🔥 FORCE RESET TRANSFORM (THIS FIXES STUCK DOORS)
+    d.style.animation = 'none';
+    d.offsetHeight; // force reflow
+    d.style.animation = '';
+    d.style.transform = '';
+  });
+
+  answer.value='';
 }
-
 /* ======================================================
    FLASH
 ====================================================== */
